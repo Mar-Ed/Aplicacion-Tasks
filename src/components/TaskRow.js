@@ -1,14 +1,12 @@
-export const TaskRow = ({task, toogleTask}) => {  //recibe una propieda por eso va entre llaves
-  return (
-    <tr key={task.name}>
-      <td>
-        {task.name}
-        <input
-          type="checkbox"
-          value={task.done}
-          onChange={() => toogleTask={task}}
-        />
-      </td>
-    </tr>
-  );
-};
+export const TaskRow = ({ task, toggleTask }) => (
+  <tr key={task.name}>
+    <td className="d-flex justify-content-between">
+      {task.name}
+      <input
+        type="checkbox"
+        checked={task.done}
+        onChange={() => toggleTask(task)}
+      />
+    </td>
+  </tr>
+);

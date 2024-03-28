@@ -1,51 +1,65 @@
-import "./App.css";
-import { TaskCreator } from "./components/TaskCreator";
 import { useState, useEffect } from "react";
-import { TaskTable } from "./components/TaskTable";
+import { TaskBanner } from "./components/TaskBanner";
+import { TaskCreator } from "./components/TaskCreator";
 import { VisibilityControl } from "./components/VisibilityControl";
-function App() {
-  const [tasksItems, setTasksItems] = useState([]);
-  const [showCompleted, setshowCompleted] = useState(false);
-  function createNewTask(taskName) {
-    if (!tasksItems.find((task) => task.name === taskName)) {
-      setTasksItems([...tasksItems, { name: taskName, done: false }]);
-    }
-  }
+import { TaskTable } from "./components/TaskTable";
+import { Container } from "./components/Container";
 
-  const toggleTask = (task) => {
-    setTasksItems(
-      tasksItems.map((t) =>
-        t.name === task.name ? { ...t, done: !t.done } : t
-      )
-    );
-  };
+function App() {
+  const [userName, setUserName] = useState("Fazt");
+  const [taskItems, setTaskItems] = useState([]);
+  const [showCompleted, setshowCompleted] = useState(false);
 
   useEffect(() => {
     let data = localStorage.getItem("tasks");
     if (data) {
-      setTasksItems(JSON.parse(data));
+      setTaskItems(JSON.parse(data));
     }
+    setUserName("fazt");
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasksItems));
-  }, [tasksItems]);
-  return (
-    <div className="App">
-      <TaskCreator createNewTask={createNewTask} />
-      <TaskTable tasks={tasksItems} toggleTask={toggleTask} />
+    localStorage.setItem("tasks", JSON.stringify(taskItems));
+  }, [taskItems]);
 
-      <VisibilityControl 
-        setShowCompleted={(checked)=>setshowCompleted(checked)} 
-      />
-      {
-        showCompleted === true && (<TaskTable
-          tasks={tasksItems}
-          toggleTask={toggleTask}
-          showCompleted={showCompleted}
-        />)
-      }
-    </div>
+  const createNewTask = (taskName) => {
+    if (!taskItems.find((t) => t.name === taskName))
+      setTaskItems([...taskItems, { name: taskName, done: false }]);
+  };
+
+  const toggleTask = (task) =>
+    setTaskItems(
+      taskItems.map((t) => (t.name === task.name ? { ...t, done: !t.done } : t))
+    );
+
+  const cleanTasks = () => {
+    setTaskItems(taskItems.filter((task) => !task.done));
+    setshowCompleted(false);
+  };
+
+  return (
+    <main className="bg-dark vh-100 text-white">
+      <TaskBanner userName={userName} taskItems={taskItems} />
+      <Container>
+        <TaskCreator createNewTask={createNewTask} />
+        <TaskTable tasks={taskItems} toggleTask={toggleTask} />
+        <VisibilityControl
+          description="Completed Tasks"
+          isChecked={showCompleted}
+          callback={(checked) => setshowCompleted(checked)}
+          cleanTasks={cleanTasks}
+        />
+        {showCompleted && (
+          <TaskTable
+            tasks={taskItems}
+            toggleTask={toggleTask}
+            showCompleted={showCompleted}
+          />
+        )}
+      </Container>
+    </main>
   );
 }
+
 export default App;
+
